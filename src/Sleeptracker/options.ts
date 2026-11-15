@@ -24,5 +24,6 @@ export const getUsers = () => {
   return [credentials];
 };
 export const getRefreshFrequency = () => options.sleeptrackerRefreshFrequency;
-// minutes between sleep summary fetches; 0 disables sleep sensors
+// minutes between sleep summary polls while waiting for the next night (polling pauses once a
+// night is retrieved, until 22h after its wake time - see sleepFetchSchedule); 0 disables sleep sensors
 export const getSleepRefreshFrequency = () => options.sleeptrackerSleepRefreshFrequency ?? 15;

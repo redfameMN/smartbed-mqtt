@@ -8,6 +8,7 @@ import { SleepSummarySensor, SleepSummarySensorConfig } from '../entities/SleepS
 import { mapSleepSummary, pickLatestNight } from '../mapSleepSummary';
 import { getSleepRefreshFrequency } from '../options';
 import { getSleepSummary } from '../requests/getSleepSummary';
+import { SleepFetchState, shouldFetchSleep } from '../sleepFetchSchedule';
 import { Bed } from '../types/Bed';
 
 const duration = { device_class: 'duration', unit_of_measurement: 'min', state_class: 'measurement' };
@@ -36,7 +37,7 @@ const definitions: SensorDefinition[] = [
 ];
 
 const sensorsBySide: Dictionary<SleepSummarySensor[]> = {};
-const lastFetchByUser: Dictionary<number> = {};
+const fetchStateByUser: Dictionary<SleepFetchState> = {};
 
 export const processSleepSummarySensors = async (mqtt: IMQTTConnection, bed: Bed) => {
   const frequency = getSleepRefreshFrequency();
@@ -50,16 +51,23 @@ export const processSleepSummarySensors = async (mqtt: IMQTTConnection, bed: Bed
     if (!user) continue; // no configured account for this side
 
     const now = Date.now();
-    if (now - (lastFetchByUser[user.email] || 0) < minutes(frequency)) continue;
-    lastFetchByUser[user.email] = now;
+    const fetchState = fetchStateByUser[user.email];
+    if (!shouldFetchSleep(fetchState, now, minutes(frequency))) continue;
+    const lastGotUp = fetchState?.lastGotUp ?? null;
+    fetchStateByUser[user.email] = { lastFetch: now, lastGotUp };
 
     const nights = await getSleepSummary(user);
-    if (!nights) continue;
+    if (!nights) continue; // failed; retried after `frequency` minutes
     const night = pickLatestNight(nights);
     if (!night) {
       logInfo('[Sleeptracker] No processed nights yet for side', side);
       continue;
     }
+    const gotUp = typeof night.lastOffBedTimeSecs === 'number' ? night.lastOffBedTimeSecs * 1000 : null;
+    if (gotUp !== null && gotUp !== lastGotUp) {
+      logInfo('[Sleeptracker] Retrieved sleep summary for side', side, 'night of', night.dayYYYYMMDD);
+    }
+    fetchStateByUser[user.email].lastGotUp = gotUp;
 
     const key = `${bed.processorId}.${side}`;
     const sideName = sideNameFunc(sensor);
