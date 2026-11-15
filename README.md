@@ -66,6 +66,19 @@ e.g.
 
 `sleeptrackerRefreshFrequency` is in minutes.
 
+`sleeptrackerSleepRefreshFrequency` (optional, minutes, default `15`, `0` disables) controls the sleep summary sensors. Sleeptracker processes a night roughly an hour after you get up, so the add-on polls at this interval until the night appears, then pauses until 22 hours after that night's wake time and starts polling for the next one. Each user is polled independently, so each side of a split bed follows its own schedule.
+
+## Sleep summary sensors
+
+For each configured user (each side of a split bed), sensors for the most recent processed night:
+
+- Sleep Score (the full night summary, including bed/asleep/wake times, heart rate, HRV, breathing rate and snoring, is available as attributes)
+- Time Asleep, Time In Bed, Deep Sleep, Light Sleep, REM Sleep and Awake Time (minutes)
+- Sleep Efficiency (%)
+- Last Sleep (timestamp of getting up)
+
+The night's data belongs to the account whose credentials are used, so a split bed needs a separate account configured for each side. There is no real-time asleep/awake state; values update once the night has been processed.
+
 ## Current features include:
 
 - Buttons to trigger the presets
@@ -78,6 +91,7 @@ e.g.
 - Sensors for Massage strengths and patterns
 - Support for split beds, and multiple beds
 - Covers to control motors for raising, lowering, and stopping the head/feet/tilt/lumbar
+- Sleep summary sensors (score, time asleep/in bed, sleep stages, efficiency) per user
 
 ## Possible future features:
 
