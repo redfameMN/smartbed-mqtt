@@ -15,6 +15,7 @@ import { setupMassageButtons } from './processors/massageButtons';
 import { processMassageSensors } from './processors/massageSensors';
 import { setupPresetButtons } from './processors/presetButtons';
 import { processSafetyLightSwitches } from './processors/safetyLightSwitches';
+import { processSleepSummarySensors } from './processors/sleepSummarySensors';
 import { processSnoreReliefSwitches } from './processors/snoreReliefSwitches';
 import { getDevices } from './requests/getDevices';
 import { getHelloData } from './requests/getHelloData';
@@ -32,7 +33,8 @@ export const sleeptracker = async (mqtt: IMQTTConnection) => {
   for (const user of users) {
     const devices = await getDevices(user);
     if (devices.length === 0) {
-      return logError('[Sleeptracker] Could not load devices');
+      logError('[Sleeptracker] Could not load devices for', user.email);
+      continue;
     }
     for (const device of devices) {
       const { sleeptrackerProcessorID: processorId } = device;
@@ -131,6 +133,7 @@ export const sleeptracker = async (mqtt: IMQTTConnection) => {
         }
       }
       if (environmentSensors) await processEnvironmentSensors(mqtt, bed);
+      await processSleepSummarySensors(mqtt, bed);
     }
   };
   await refreshDeviceData();

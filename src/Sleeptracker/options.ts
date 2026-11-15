@@ -10,6 +10,7 @@ export interface Credentials {
 
 interface OptionsJson {
   sleeptrackerRefreshFrequency: number;
+  sleeptrackerSleepRefreshFrequency?: number;
   sleeptrackerCredentials: Credentials[];
 }
 
@@ -23,3 +24,5 @@ export const getUsers = () => {
   return [credentials];
 };
 export const getRefreshFrequency = () => options.sleeptrackerRefreshFrequency;
+// minutes between sleep summary fetches; 0 disables sleep sensors
+export const getSleepRefreshFrequency = () => options.sleeptrackerSleepRefreshFrequency ?? 15;

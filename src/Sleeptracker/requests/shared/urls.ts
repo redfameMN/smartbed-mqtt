@@ -19,6 +19,7 @@ type UrlCache = {
   fpcsiotBaseUrl: string;
   processorBaseUrl: string;
   settingsBaseUrl: string;
+  webuiUrl: string;
 };
 
 const urlCacheByType: Dictionary<UrlCache> = {};
@@ -36,7 +37,9 @@ export const urls = ({ type }: Credentials) => {
     const fpcsiotBaseUrl = `https://${appHost}/actrack-client/v2/fpcsiot`;
     const processorBaseUrl = `${fpcsiotBaseUrl}/processor`;
     const settingsBaseUrl = `${fpcsiotBaseUrl}/settings`;
+    const webuiUrl = `https://${appHost}/actrack-client/v2/actrack/webui`;
     urlCache = urlCacheByType[type] = {
+      webuiUrl,
       authHost,
       authRequestUrl,
       appHost,

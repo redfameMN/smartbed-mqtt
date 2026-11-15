@@ -14,3 +14,10 @@ autotest_output/
 
 yarn-error.log
 thumbs.db
+# Local secrets / test data — never commit
+data/
+options.json
+.env
+.env.*
+*-webui-*.json
+smartbed-mqtt-probe/
